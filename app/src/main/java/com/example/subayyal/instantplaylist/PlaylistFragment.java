@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ListView;
 
 import com.example.subayyal.instantplaylist.DynamicList.Adapter;
 import com.example.subayyal.instantplaylist.DynamicList.CustomListView;
@@ -19,11 +20,11 @@ import java.util.ArrayList;
  * Created by subayyal on 4/11/2018.
  */
 
-public class VideoFragment extends Fragment {
+public class PlaylistFragment extends Fragment {
 
     private ArrayList<SearchResult> list;
     private Adapter adapter;
-    CustomListView listView;
+    private ListView listView;
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -34,6 +35,17 @@ public class VideoFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         list = new ArrayList<>();
+        adapter = new Adapter(getContext(), list, new Adapter.PlaylistListener() {
+            @Override
+            public void onPlayFromPlaylist(SearchResult result) {
+                ((MainActivity)getActivity()).playSelectedVideoFromPlaylist(result);
+            }
+
+            @Override
+            public void onRemoveFromPlaylist(String videoId) {
+
+            }
+        });
 
     }
 
@@ -41,19 +53,28 @@ public class VideoFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        Log.d("Test", "onActivityCreated");
         listView = getView().findViewById(R.id.playlist_listview);
-        listView.setData(this.list);
-        adapter = new Adapter(getContext(),list);
         listView.setAdapter(adapter);
 
 
     }
 
+    public String getNext(){
+        return adapter.getNext();
+    }
 
+
+    public void setCurrentPlaying(String videoId) {
+        adapter.setCurrentPLaying(videoId);
+    }
 
     public void addToQueue(SearchResult result) {
         Log.d("Test", "addToQueue called");
+        adapter.add(result);
+    }
+
+    public void newQueue(SearchResult result) {
+        adapter.clear();
         adapter.add(result);
     }
 

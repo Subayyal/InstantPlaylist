@@ -15,7 +15,7 @@ public class ViewHolder extends RecyclerView.ViewHolder {
     public TextView mVideoDetail;
     public ImageView mImageView;
     public ImageView mOptions;
-    public OnOptionsClickListener listener;
+    public OnClickListener listener;
 
     public ViewHolder(View v) {
         super(v);
@@ -30,14 +30,21 @@ public class ViewHolder extends RecyclerView.ViewHolder {
                 listener.onOptionsClick();
             }
         });
+        v.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                listener.onViewClick();
+            }
+        });
     }
 
-    public void setListener(OnOptionsClickListener listener) {
+    public void setListener(OnClickListener listener) {
         this.listener = listener;
     }
 
-    public interface OnOptionsClickListener{
+    public interface OnClickListener {
         void onOptionsClick();
+        void onViewClick();
     }
 
 }

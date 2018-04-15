@@ -47,11 +47,16 @@ public class SearchListAdapter extends RecyclerView.Adapter<ViewHolder> {
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
-        holder.setListener(new ViewHolder.OnOptionsClickListener() {
+        holder.setListener(new ViewHolder.OnClickListener() {
             @Override
             public void onOptionsClick() {
                 Log.d("Test", " onOptionsClick pos:"+holder.getAdapterPosition());
                 showMenu(holder.mOptions, holder.getAdapterPosition());
+            }
+
+            @Override
+            public void onViewClick() {
+                listAdapterListener.onPlayVideo(searchResults.get(holder.getAdapterPosition()));
             }
         });
 
@@ -100,6 +105,12 @@ public class SearchListAdapter extends RecyclerView.Adapter<ViewHolder> {
         menu.show();
     }
 
+    public void setData(List<SearchResult> list) {
+        this.searchResults = list;
+        notifyDataSetChanged();
+    }
+
+
     @Override
     public int getItemCount() {
         return searchResults.size();
@@ -107,6 +118,8 @@ public class SearchListAdapter extends RecyclerView.Adapter<ViewHolder> {
 
     public interface SearchListAdapterListener {
         void onAddToQueue(SearchResult result);
+
+        void onPlayVideo(SearchResult result);
     }
 
 }

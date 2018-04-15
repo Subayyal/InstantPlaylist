@@ -24,32 +24,43 @@ import java.util.Map;
 
 public class Adapter extends ArrayAdapter<SearchResult> {
 
-    final int INVALID_ID = -1;
+    int currentPLaying;
 
-    HashMap<SearchResult, Integer> mIdMap = new HashMap<SearchResult, Integer>();
+    List<SearchResult> objects;
 
-    public Adapter(Context context, List<SearchResult> objects) {
+    PlaylistListener listener;
+
+    public Adapter(Context context, List<SearchResult> objects, PlaylistListener listener) {
         super(context, 0, objects);
-        for (int i = 0; i < objects.size(); ++i) {
-            mIdMap.put(objects.get(i), i);
-        }
+        this.objects = objects;
+        this.listener = listener;
     }
 
     @NonNull
     @Override
-    public View getView(int position, @Nullable View view, @NonNull ViewGroup parent) {
+    public View getView(final int position, @Nullable View view, @NonNull ViewGroup parent) {
         Context context = getContext();
-        if(null == view) {
+        if (null == view) {
             view = LayoutInflater.from(context).inflate(R.layout.playlist_item_layout
                     , null);
         }
 
         TextView playlist_item_title = view.findViewById(R.id.playlist_item_title);
-        playlist_item_title.setText(getItem(position).getSnippet().getTitle());
+        playlist_item_title.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                listener.onPlayFromPlaylist(getItem(position));
+            }
+        });
+        if (currentPLaying == position) {
+            playlist_item_title.setText(">>" + getItem(position).getSnippet().getTitle());
+        } else {
+            playlist_item_title.setText(getItem(position).getSnippet().getTitle());
+        }
 
         return view;
     }
-
+/*
     @Override
     public long getItemId(int position) {
         if (position < 0 || position >= mIdMap.size()) {
@@ -57,16 +68,42 @@ public class Adapter extends ArrayAdapter<SearchResult> {
         }
         SearchResult item = getItem(position);
         return mIdMap.get(item);
-    }
+    }*/
 
     @Override
     public boolean hasStableIds() {
         return true;
     }
 
+    public void setCurrentPLaying(String videoId) {
+        for (int i = 0; i < objects.size(); i++) {
+            if (objects.get(i).getId().getVideoId().equals(videoId)) {
+                currentPLaying = i;
+                notifyDataSetChanged();
+            }
+        }
+    }
+
+    public String getNext() {
+        if (currentPLaying < objects.size() - 1) {
+            return objects.get(currentPLaying + 1).getId().getVideoId();
+        }
+        return null;
+    }
 
     @Override
     public void add(@Nullable SearchResult object) {
+        for (int i = 0; i < objects.size(); i++) {
+            if (objects.get(i).equals(object)) {
+                return;
+            }
+        }
         super.add(object);
     }
+
+    public interface PlaylistListener{
+        void onPlayFromPlaylist(SearchResult result);
+        void onRemoveFromPlaylist(String videoId);
+    }
+
 }
