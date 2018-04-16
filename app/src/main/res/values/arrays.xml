@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="sort_by">
+        <item>Relevance</item>
+        <item>Upload date</item>
+        <item>View count</item>
+        <item>Rating</item>
+    </string-array>
+
+    <string-array name="upload_date">
+        <item>Anytime</item>
+        <item>Today</item>
+        <item>This week</item>
+        <item>This month</item>
+    </string-array>
+</resources>

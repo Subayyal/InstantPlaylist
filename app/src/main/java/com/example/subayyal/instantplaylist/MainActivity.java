@@ -2,6 +2,7 @@ package com.example.subayyal.instantplaylist;
 
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -9,11 +10,15 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Spinner;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.github.pedrovgs.DraggableListener;
 import com.github.pedrovgs.DraggablePanel;
@@ -21,6 +26,8 @@ import com.google.android.youtube.player.YouTubeInitializationResult;
 import com.google.android.youtube.player.YouTubePlayer;
 import com.google.android.youtube.player.YouTubePlayerSupportFragment;
 import com.google.api.services.youtube.model.SearchResult;
+
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,12 +52,22 @@ public class MainActivity extends AppCompatActivity {
     List<SearchResult> searchResults;
 
     private boolean draggableInitialized;
-    private String curVideoId;
+
+    private ConstraintLayout search_filter_layout;
+    private TextView sort_by_tv;
+    private Spinner sort_by_spinner;
+    private TextView upload_by_tv;
+    private Spinner upload_by_spinner;
+    private SearchView searchView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        search_filter_layout = findViewById(R.id.search_filters_layout);
+        sort_by_spinner = findViewById(R.id.sort_by_spinner);
+        upload_by_spinner = findViewById(R.id.upload_date_spinner);
 
         repository = new Repository(this);
 
@@ -75,6 +92,8 @@ public class MainActivity extends AppCompatActivity {
         searchRecyclerView.setLayoutManager(layoutManager);
         searchRecyclerView.setAdapter(searchListAdapter);
         hookDraggablePanelListeners();
+
+
 
     }
 
@@ -121,7 +140,6 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onAdStarted() {
-
             }
 
             @Override
@@ -216,14 +234,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public String getCurVideoId() {
-        return curVideoId;
-    }
-
-    public void setCurVideoId(String curVideoId) {
-        this.curVideoId = curVideoId;
-    }
-
     public boolean isDraggableInitialized() {
         return draggableInitialized;
     }
@@ -232,8 +242,8 @@ public class MainActivity extends AppCompatActivity {
         this.draggableInitialized = draggableInitialized;
     }
 
-    public void search() {
-        repository.search()
+    public void search(String query) {
+        repository.search(query)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new SingleObserver<List<SearchResult>>() {
@@ -257,18 +267,35 @@ public class MainActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.top_menu, menu);
-        return true;
-    }
+        final MenuItem searchItem = menu.findItem(R.id.action_search);
+        searchView = (SearchView) searchItem.getActionView();
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle item selection
-        switch (item.getItemId()) {
-            case R.id.search:
-                search();
+        searchItem.setOnActionExpandListener(new MenuItem.OnActionExpandListener() {
+            @Override
+            public boolean onMenuItemActionExpand(MenuItem menuItem) {
+                search_filter_layout.setVisibility(View.VISIBLE);
                 return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
+            }
+
+            @Override
+            public boolean onMenuItemActionCollapse(MenuItem menuItem) {
+                search_filter_layout.setVisibility(View.GONE);
+                return true;
+            }
+        });
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                search(query);
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                return false;
+            }
+        });
+
+        return true;
     }
 }
