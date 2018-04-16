@@ -40,11 +40,6 @@ public class PlaylistFragment extends Fragment {
             public void onPlayFromPlaylist(SearchResult result) {
                 ((MainActivity)getActivity()).playSelectedVideoFromPlaylist(result);
             }
-
-            @Override
-            public void onRemoveFromPlaylist(String videoId) {
-
-            }
         });
 
     }
