@@ -16,6 +16,8 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -65,11 +67,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        search_filter_layout = findViewById(R.id.search_filters_layout);
-        sort_by_spinner = findViewById(R.id.sort_by_spinner);
-        upload_by_spinner = findViewById(R.id.upload_date_spinner);
-
         repository = new Repository(this);
+        setupSearchFilter();
 
         draggablePanel = findViewById(R.id.draggable_panel_view);
         setDraggableInitialized(false);
@@ -94,6 +93,21 @@ public class MainActivity extends AppCompatActivity {
         hookDraggablePanelListeners();
 
 
+
+    }
+
+    public void setupSearchFilter(){
+        search_filter_layout = findViewById(R.id.search_filters_layout);
+        sort_by_spinner = findViewById(R.id.sort_by_spinner);
+        upload_by_spinner = findViewById(R.id.upload_date_spinner);
+
+        ArrayAdapter<CharSequence> sortByAdapter = ArrayAdapter.createFromResource(this, R.array.sort_by, R.layout.support_simple_spinner_dropdown_item);
+        sortByAdapter.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item);
+        sort_by_spinner.setAdapter(sortByAdapter);
+
+        ArrayAdapter<CharSequence> uploadByAdapter = ArrayAdapter.createFromResource(this, R.array.upload_date, R.layout.support_simple_spinner_dropdown_item);
+        uploadByAdapter.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item);
+        upload_by_spinner.setAdapter(uploadByAdapter);
 
     }
 
@@ -242,8 +256,8 @@ public class MainActivity extends AppCompatActivity {
         this.draggableInitialized = draggableInitialized;
     }
 
-    public void search(String query) {
-        repository.search(query)
+    public void search(SearchObject searchObject) {
+        repository.search(searchObject)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new SingleObserver<List<SearchResult>>() {
@@ -286,7 +300,11 @@ public class MainActivity extends AppCompatActivity {
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                search(query);
+                SearchObject searchObject = new SearchObject();
+                searchObject.setQuery(query);
+                searchObject.setSortBy(sort_by_spinner.getSelectedItem().toString());
+                searchObject.setUploadDate(upload_by_spinner.getSelectedItem().toString());
+                search(searchObject);
                 return false;
             }
 

@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string-array name="sort_by">
-        <item>Relevance</item>
-        <item>Upload date</item>
-        <item>View count</item>
-        <item>Rating</item>
+        <item>relevance</item>
+        <item>date</item>
+        <item>viewCount</item>
+        <item>rating</item>
     </string-array>
 
     <string-array name="upload_date">

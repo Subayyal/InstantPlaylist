@@ -59,7 +59,7 @@ public class Repository {
         }).setApplicationName("Instant Playlist").build();
     }
 
-    public Single<List<SearchResult>> search(final String q){
+    public Single<List<SearchResult>> search(final SearchObject searchObject){
         return Single.create(new SingleOnSubscribe<List<SearchResult>>() {
             @Override
             public void subscribe(SingleEmitter<List<SearchResult>> emitter) throws Exception {
@@ -69,7 +69,8 @@ public class Repository {
                     query = youTube.search().list("id, snippet");
                     query.setKey(Constants.apiKey);
                     query.setType("video");
-                    query.setQ(q);
+                    query.setQ(searchObject.getQuery());
+                    query.setOrder(searchObject.getSortBy());
                     query.setMaxResults(Long.valueOf(10));
                     SearchListResponse response = query.execute();
                     results = response.getItems();
