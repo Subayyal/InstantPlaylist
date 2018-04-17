@@ -78,8 +78,11 @@ public class MainActivity extends AppCompatActivity {
         searchListAdapter = new SearchListAdapter(searchResults, this, new SearchListAdapter.SearchListAdapterListener() {
             @Override
             public void onAddToQueue(SearchResult result) {
-                playlistFragment.addToQueue(result);
-                Snackbar.make(findViewById(R.id.activity_main), "Added to queue", Snackbar.LENGTH_SHORT).show();
+                if (draggableInitialized) {
+                    playlistFragment.addToQueue(result);
+                } else {
+                    playSelectedVideo(result);
+                }
             }
 
             @Override

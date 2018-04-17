@@ -105,6 +105,7 @@ public class Adapter extends ArrayAdapter<SearchResult> {
 
     @Override
     public void remove(@Nullable SearchResult object) {
+
         super.remove(object);
     }
 
