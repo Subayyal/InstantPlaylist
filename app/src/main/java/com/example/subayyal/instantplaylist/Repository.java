@@ -45,6 +45,7 @@ public class Repository {
     private YouTube youTube;
     private Context context;
     private String searchNextPageToken;
+    private SearchObject searchObject;
 
     public Repository(Context c) {
         this.context = c;
@@ -58,6 +59,14 @@ public class Repository {
                 request.getHeaders().set("X-Android-Cert",SHA1);
             }
         }).setApplicationName("Instant Playlist").build();
+    }
+
+    public SearchObject getSearchObject() {
+        return searchObject;
+    }
+
+    public void setSearchObject(SearchObject searchObject) {
+        this.searchObject = searchObject;
     }
 
     public String getSearchNextPageToken() {
@@ -77,15 +86,15 @@ public class Repository {
                         YouTube.Search.List query;
                         query = youTube.search().list("id, snippet");
                         query.setKey(Constants.apiKey);
+                        query.setType("video");
+                        query.setQ(getSearchObject().getQuery());
+                        query.setOrder(getSearchObject().getSortBy());
+                        query.setVideoEmbeddable("true");
                         query.setPageToken(getSearchNextPageToken());
                         query.setMaxResults(Long.valueOf(20));
                         SearchListResponse response = query.execute();
                         List<SearchResult> results = response.getItems();
                         setSearchNextPageToken(response.getNextPageToken());
-                        for(SearchResult result: results){
-                            String json = new Gson().toJson(result);
-                            Log.d("Test", json);
-                        }
                         emitter.onSuccess(results);
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -103,22 +112,19 @@ public class Repository {
             @Override
             public void subscribe(SingleEmitter<List<SearchResult>> emitter) throws Exception {
                 List<SearchResult> results = null;
+                setSearchObject(searchObject);
                 try {
                     YouTube.Search.List query;
                     query = youTube.search().list("id, snippet");
                     query.setKey(Constants.apiKey);
                     query.setType("video");
-                    query.setQ(searchObject.getQuery());
-                    query.setOrder(searchObject.getSortBy());
+                    query.setQ(getSearchObject().getQuery());
+                    query.setOrder(getSearchObject().getSortBy());
                     query.setVideoEmbeddable("true");
                     query.setMaxResults(Long.valueOf(20));
                     SearchListResponse response = query.execute();
                     results = response.getItems();
                     setSearchNextPageToken(response.getNextPageToken());
-                    for(SearchResult result: results){
-                        String json = new Gson().toJson(result);
-                        Log.d("Test", json);
-                    }
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

@@ -3,10 +3,6 @@ package com.example.subayyal.instantplaylist;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.constraint.ConstraintLayout;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -16,21 +12,18 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.FrameLayout;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.example.subayyal.instantplaylist.DynamicList.EndlessRecyclerViewScrollListener;
 import com.github.pedrovgs.DraggableListener;
 import com.github.pedrovgs.DraggablePanel;
 import com.google.android.youtube.player.YouTubeInitializationResult;
 import com.google.android.youtube.player.YouTubePlayer;
 import com.google.android.youtube.player.YouTubePlayerSupportFragment;
 import com.google.api.services.youtube.model.SearchResult;
-
-import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,6 +37,7 @@ public class MainActivity extends AppCompatActivity {
 
     PlaylistFragment playlistFragment = new PlaylistFragment();
     Repository repository;
+    MenuItem searchItem;
 
     YouTubePlayerSupportFragment youtubeFragment;
     YouTubePlayer youtubePlayer;
@@ -62,11 +56,14 @@ public class MainActivity extends AppCompatActivity {
     private TextView upload_by_tv;
     private Spinner upload_by_spinner;
     private SearchView searchView;
+    private FrameLayout progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        progressBar = findViewById(R.id.progress_bar_container);
 
         repository = new Repository(this);
         setupSearchFilter();
@@ -88,6 +85,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onPlayVideo(SearchResult result) {
+                searchItem.collapseActionView();
                 playSelectedVideo(result);
             }
         });
@@ -219,6 +217,7 @@ public class MainActivity extends AppCompatActivity {
         draggablePanel.setDraggableListener(new DraggableListener() {
             @Override
             public void onMaximized() {
+                search_filter_layout.setVisibility(View.GONE);
                 playVideo();
             }
 
@@ -272,16 +271,18 @@ public class MainActivity extends AppCompatActivity {
                 .subscribe(new SingleObserver<List<SearchResult>>() {
                     @Override
                     public void onSubscribe(Disposable d) {
+                        progressBar.setVisibility(View.VISIBLE);
                     }
 
                     @Override
                     public void onSuccess(List<SearchResult> results) {
+                        progressBar.setVisibility(View.GONE);
                         searchListAdapter.setData(results);
                     }
 
                     @Override
                     public void onError(Throwable e) {
-
+                        progressBar.setVisibility(View.GONE);
                     }
                 });
     }
@@ -308,7 +309,7 @@ public class MainActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.top_menu, menu);
-        final MenuItem searchItem = menu.findItem(R.id.action_search);
+        searchItem = menu.findItem(R.id.action_search);
         searchView = (SearchView) searchItem.getActionView();
 
         searchItem.setOnActionExpandListener(new MenuItem.OnActionExpandListener() {

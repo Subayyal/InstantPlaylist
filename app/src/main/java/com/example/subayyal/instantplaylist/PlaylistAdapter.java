@@ -1,4 +1,4 @@
-package com.example.subayyal.instantplaylist.DynamicList;
+package com.example.subayyal.instantplaylist;
 
 /**
  * Created by subayyal on 4/12/2018.
@@ -23,7 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class Adapter extends ArrayAdapter<SearchResult> {
+public class PlaylistAdapter extends ArrayAdapter<SearchResult> {
 
     int currentPLaying;
 
@@ -31,7 +31,7 @@ public class Adapter extends ArrayAdapter<SearchResult> {
 
     PlaylistListener listener;
 
-    public Adapter(Context context, List<SearchResult> objects, PlaylistListener listener) {
+    public PlaylistAdapter(Context context, List<SearchResult> objects, PlaylistListener listener) {
         super(context, 0, objects);
         this.objects = objects;
         this.listener = listener;

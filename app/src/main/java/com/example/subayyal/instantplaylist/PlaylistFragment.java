@@ -2,7 +2,6 @@ package com.example.subayyal.instantplaylist;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -10,8 +9,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 
-import com.example.subayyal.instantplaylist.DynamicList.Adapter;
-import com.example.subayyal.instantplaylist.DynamicList.CustomListView;
 import com.google.api.services.youtube.model.SearchResult;
 
 import java.util.ArrayList;
@@ -23,7 +20,7 @@ import java.util.ArrayList;
 public class PlaylistFragment extends Fragment {
 
     private ArrayList<SearchResult> list;
-    private Adapter adapter;
+    private PlaylistAdapter playlistAdapter;
     private ListView listView;
     @Nullable
     @Override
@@ -35,7 +32,7 @@ public class PlaylistFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         list = new ArrayList<>();
-        adapter = new Adapter(getContext(), list, new Adapter.PlaylistListener() {
+        playlistAdapter = new PlaylistAdapter(getContext(), list, new PlaylistAdapter.PlaylistListener() {
             @Override
             public void onPlayFromPlaylist(SearchResult result) {
                 ((MainActivity)getActivity()).playSelectedVideoFromPlaylist(result);
@@ -48,28 +45,28 @@ public class PlaylistFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
 
         listView = getView().findViewById(R.id.playlist_listview);
-        listView.setAdapter(adapter);
+        listView.setAdapter(playlistAdapter);
 
 
     }
 
     public String getNext(){
-        return adapter.getNext();
+        return playlistAdapter.getNext();
     }
 
 
     public void setCurrentPlaying(String videoId) {
-        adapter.setCurrentPLaying(videoId);
+        playlistAdapter.setCurrentPLaying(videoId);
     }
 
     public void addToQueue(SearchResult result) {
         Log.d("Test", "addToQueue called");
-        adapter.add(result);
+        playlistAdapter.add(result);
     }
 
     public void newQueue(SearchResult result) {
-        adapter.clear();
-        adapter.add(result);
+        playlistAdapter.clear();
+        playlistAdapter.add(result);
     }
 
 }
