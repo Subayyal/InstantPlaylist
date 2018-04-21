@@ -44,6 +44,7 @@ public class Repository {
 
     private YouTube youTube;
     private Context context;
+    private String searchNextPageToken;
 
     public Repository(Context c) {
         this.context = c;
@@ -59,6 +60,44 @@ public class Repository {
         }).setApplicationName("Instant Playlist").build();
     }
 
+    public String getSearchNextPageToken() {
+        return searchNextPageToken;
+    }
+
+    public void setSearchNextPageToken(String searchNextPageToken) {
+        this.searchNextPageToken = searchNextPageToken;
+    }
+
+    public Single<List<SearchResult>> nextPage() {
+        return Single.create(new SingleOnSubscribe<List<SearchResult>>() {
+            @Override
+            public void subscribe(SingleEmitter<List<SearchResult>> emitter) throws Exception {
+                if (getSearchNextPageToken() != null) {
+                    try {
+                        YouTube.Search.List query;
+                        query = youTube.search().list("id, snippet");
+                        query.setKey(Constants.apiKey);
+                        query.setPageToken(getSearchNextPageToken());
+                        query.setMaxResults(Long.valueOf(20));
+                        SearchListResponse response = query.execute();
+                        List<SearchResult> results = response.getItems();
+                        setSearchNextPageToken(response.getNextPageToken());
+                        for(SearchResult result: results){
+                            String json = new Gson().toJson(result);
+                            Log.d("Test", json);
+                        }
+                        emitter.onSuccess(results);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    //do nothing
+                }
+            }
+        });
+    }
+
+
     public Single<List<SearchResult>> search(final SearchObject searchObject){
         return Single.create(new SingleOnSubscribe<List<SearchResult>>() {
             @Override
@@ -71,9 +110,11 @@ public class Repository {
                     query.setType("video");
                     query.setQ(searchObject.getQuery());
                     query.setOrder(searchObject.getSortBy());
-                    query.setMaxResults(Long.valueOf(10));
+                    query.setVideoEmbeddable("true");
+                    query.setMaxResults(Long.valueOf(20));
                     SearchListResponse response = query.execute();
                     results = response.getItems();
+                    setSearchNextPageToken(response.getNextPageToken());
                     for(SearchResult result: results){
                         String json = new Gson().toJson(result);
                         Log.d("Test", json);

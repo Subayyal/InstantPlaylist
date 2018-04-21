@@ -41,7 +41,6 @@ public class PlaylistFragment extends Fragment {
                 ((MainActivity)getActivity()).playSelectedVideoFromPlaylist(result);
             }
         });
-
     }
 
     @Override

@@ -110,6 +110,11 @@ public class SearchListAdapter extends RecyclerView.Adapter<ViewHolder> {
         notifyDataSetChanged();
     }
 
+    public void nextPage(List<SearchResult> searchResults) {
+        this.searchResults.addAll(searchResults);
+        notifyDataSetChanged();
+    }
+
 
     @Override
     public int getItemCount() {

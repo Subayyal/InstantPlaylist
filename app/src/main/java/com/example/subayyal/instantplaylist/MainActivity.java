@@ -22,6 +22,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.subayyal.instantplaylist.DynamicList.EndlessRecyclerViewScrollListener;
 import com.github.pedrovgs.DraggableListener;
 import com.github.pedrovgs.DraggablePanel;
 import com.google.android.youtube.player.YouTubeInitializationResult;
@@ -50,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
 
     RecyclerView searchRecyclerView;
     SearchListAdapter searchListAdapter;
-    RecyclerView.LayoutManager layoutManager;
+    LinearLayoutManager layoutManager;
     List<SearchResult> searchResults;
 
     private boolean draggableInitialized;
@@ -92,10 +93,15 @@ public class MainActivity extends AppCompatActivity {
         });
         layoutManager = new LinearLayoutManager(this);
         searchRecyclerView.setLayoutManager(layoutManager);
+        EndlessRecyclerViewScrollListener endlessRecyclerViewScrollListener = new EndlessRecyclerViewScrollListener(layoutManager) {
+            @Override
+            public void onLoadMore(int page, int totalItemsCount, View view) {
+                loadMore();
+            }
+        };
+        searchRecyclerView.addOnScrollListener(endlessRecyclerViewScrollListener);
         searchRecyclerView.setAdapter(searchListAdapter);
         hookDraggablePanelListeners();
-
-
 
     }
 
@@ -277,6 +283,24 @@ public class MainActivity extends AppCompatActivity {
                     public void onError(Throwable e) {
 
                     }
+                });
+    }
+
+    public void loadMore(){
+        repository.nextPage()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new SingleObserver<List<SearchResult>>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {}
+
+                    @Override
+                    public void onSuccess(List<SearchResult> results) {
+                        searchListAdapter.nextPage(results);
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {}
                 });
     }
 
