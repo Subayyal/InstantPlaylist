@@ -217,13 +217,14 @@ public class MainActivity extends AppCompatActivity {
         draggablePanel.setDraggableListener(new DraggableListener() {
             @Override
             public void onMaximized() {
+                searchItem.setVisible(false);
                 search_filter_layout.setVisibility(View.GONE);
                 playVideo();
             }
 
             @Override
             public void onMinimized() {
-                //Empty
+                searchItem.setVisible(true);
             }
 
             @Override

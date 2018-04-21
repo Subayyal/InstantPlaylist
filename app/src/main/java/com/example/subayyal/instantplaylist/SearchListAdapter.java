@@ -12,6 +12,14 @@ import android.widget.PopupMenu;
 
 import com.google.api.services.youtube.model.SearchResult;
 
+import org.ocpsoft.prettytime.PrettyTime;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAccessor;
+import java.util.Date;
 import java.util.List;
 
 import io.reactivex.Observer;
@@ -60,8 +68,8 @@ public class SearchListAdapter extends RecyclerView.Adapter<ViewHolder> {
             }
         });
 
-        holder.mVideoDetail.setText(searchResults.get(position).getSnippet().getChannelTitle()+" "+
-        searchResults.get(position).getSnippet().getPublishedAt().toString());
+        holder.mVideoDetail.setText(searchResults.get(position).getSnippet().getChannelTitle()+ " " +"\u00B7"+" " +
+        formatTime(searchResults.get(position).getSnippet().getPublishedAt().toString()));
 
         holder.mVideoTitle.setText(searchResults.get(position).getSnippet().getTitle());
 
@@ -103,6 +111,20 @@ public class SearchListAdapter extends RecyclerView.Adapter<ViewHolder> {
             }
         });
         menu.show();
+    }
+
+    private String formatTime(String time) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+        Date date = null;
+
+        try {
+            date = dateFormat.parse(time);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        PrettyTime p = new PrettyTime();
+        return p.format(date);
     }
 
     public void setData(List<SearchResult> list) {

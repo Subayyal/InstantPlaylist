@@ -34,6 +34,7 @@ dependencies {
     implementation 'io.reactivex.rxjava2:rxjava:2.1.12'
     implementation 'com.google.apis:google-api-services-youtube:v3-rev193-1.23.0'
     implementation 'com.google.code.gson:gson:2.8.2'
+    implementation 'org.ocpsoft.prettytime:prettytime:4.0.1.Final'
     compile group: 'com.google.api-client', name: 'google-api-client-gson', version: '1.23.0'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
