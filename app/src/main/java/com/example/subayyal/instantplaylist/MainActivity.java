@@ -57,6 +57,7 @@ public class MainActivity extends AppCompatActivity {
     private Spinner upload_by_spinner;
     private SearchView searchView;
     private FrameLayout progressBar;
+    private EndlessRecyclerViewScrollListener endlessRecyclerViewScrollListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,7 +92,7 @@ public class MainActivity extends AppCompatActivity {
         });
         layoutManager = new LinearLayoutManager(this);
         searchRecyclerView.setLayoutManager(layoutManager);
-        EndlessRecyclerViewScrollListener endlessRecyclerViewScrollListener = new EndlessRecyclerViewScrollListener(layoutManager) {
+        endlessRecyclerViewScrollListener = new EndlessRecyclerViewScrollListener(layoutManager) {
             @Override
             public void onLoadMore(int page, int totalItemsCount, View view) {
                 loadMore();
@@ -266,6 +267,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void search(SearchObject searchObject) {
+        endlessRecyclerViewScrollListener.resetState();
         repository.search(searchObject)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
